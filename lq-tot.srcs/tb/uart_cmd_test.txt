@@ -1,0 +1,82 @@
+/* Command List
+        The BHCND command Packets format is "$ Address CMD_MSB CMD_LSB LEN_MSB
+    LEN_LSB (*Data*) CHKSUM \n"
+        The parameter is:
+            ** 0x00 - 0x10
+            2 bytes -- name
+            4 bytes -- ip
+            1 bytes -- mode(4 MSB: gate on or gate off;
+                4 LSB: 0-pixel data; 1-list data)
+            1 bytes -- channel
+            2 bytes -- anode high voltage
+            2 bytes -- lthd of anode
+            2 bytes -- lthd of cathode
+            1 bytes -- jitter_time (unit is 0.1us. The range is 0.1 - 1.6us.)
+            1 byte  -- coin_time (unit is 0.1us. The range is 0.1 - 3.2us.)
+            ** 0x10 -- 0x20
+            2 bytes -- corse gain (not used)
+            2 bytes -- fine gain (not used)
+            2 bytes -- shapping time
+            2 bytes -- unused
+            2 bytes -- unused
+            2 bytes -- unused
+            2 bytes -- unused
+            2 bytes -- unused
+
+    Discover    		2400 0101 0000 24 0A
+                            2400 0100 0010 (Settings) ** 0A
+    Set settings        2400 0105 0010 (settings) ** 0A
+                            ACK
+    Start       		2400 0105 0000 24 0A
+                            ACK
+    Stop        		2400 0107 0000 24 0A
+                            ACK
+
+    ACK List
+        The BHCND acknowledge packets format is "$ Address CMD_MSB CMD_LSB
+    LEN_MSB LEN_LSB (*Data*) CHKBIT 0A"
+    Ok                  2400 FF00 0000 DB 0A
+    Command Error       2400 FF01 0000 DA 0A
+    Length Error        2400 FF02 0000 D9 0A
+    Checksum Error      2400 FF03 0000 D8 0A
+
+    Data List
+        The MWPC data packets format is "$ Address TYPE_MSB TYPE_LSB
+    LEN_MSB LEN_LSB (*data*) CHKBIT 0A"
+    pixel data  		2400 0200 **** (data) ** 0A	(pixel)
+    list data           2400 0201 **** (data) ** 0A	(list)
+
+    Data structure:
+    pixel data: time(32bit) posA(32bit) posB(32bit)
+    list data:  time(32bit) channel(8bit) phs(8bit)
+*/
+/* default settings:
+        s_name <= {"0", "0"};
+        s_ip <= 32'hC0A80002;
+        s_mode <= 8'd0;
+        s_channel <= 8'd0;        
+        s_hv <= 16'd1100;
+        s_althd <= 16'd405(99mV,1.8-4.3/1024*405);
+        s_clthd <= 16'd452(-98mV,1.8-4.3/1024*452);
+        s_port <= 16'h1F90;
+*/
+
+// set s_althd 50mV(1A1, 1.8-4.3/1024*417) and s_clthd -52mV(1B9, 1.8-4.3/1024*441)
+2400 0105 0010 3030 C0A8 0002 1100 044C 01A1 01B9 0909 1D0A
+// set s_althd 100mV(195, 1.8-4.3/1024*405) and s_clthd (1C4, 1.8-4.3/1024*452)
+2400 0105 0010 3030 C0A8 0002 1100 044C 0195 01C4 0409 0D0A
+// set s_althd 200mV(17B, 1.8-4.3/1024*379) and s_clthd (1DC, 1.8-4.3/1024*476)
+2400 0105 0010 3030 C0A8 0002 1100 044C 017B 01DC 0909 0D0A
+// set s_althd 300mV(165, 1.8-4.3/1024*357) and s_clthd (1F4, 1.8-4.3/1024*500)
+2400 0105 0010 3030 C0A8 0002 1100 044C 0165 01F4 0909 0D0A
+// set s_althd 500mV(135, 1.8-4.3/1024*309) and s_clthd (224, 1.8-4.3/1024*548)
+2400 0105 0010 3030 C0A8 0002 1100 044C 0135 0224 0909 0D0A
+// set s_althd 41mV(1A3, 1.8-4.3/1024*419) and s_clthd -52mV(1B6, 1.8-4.3/1024*438)
+2400 0105 0010 3030 C0A8 0002 1000 044C 01A3 01B6 0909 0D0A
+// set s_althd 20mV(1A8, 1.8-4.3/1024*424) and s_clthd -22mV(1B2, 1.8-4.3/1024*434)
+2400 0105 0010 3030 C0A8 0002 1100 044C 01A8 01B2 0909 0D0A
+
+// Start
+2400 0101 0000 24 0A
+// Stop
+2400 0102 0000 24 0A

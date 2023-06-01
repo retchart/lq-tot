@@ -1,0 +1,30 @@
+默认情况下，UDP需要建立以太网连接才能传输数据。为了跳过建立以太网连接的过程，需要在modbus_udp.v中做些修改。
+1. 将line195等待时间改为10us。
+                if (tx_wait_cnt == CYCLE_10uS_1000MBPS - 1'b1) begin // used for simulation.
+                // if (tx_wait_cnt == CYCLE_1S_1000MBPS - 1'b1) begin
+
+2. 将line 204-line218注释，并去掉line203的注释。
+                tx_state <= TX_WAIT_FRAME;  // used for simulation.
+                /*if (arp_found) begin
+                    tx_state <= TX_WAIT_FRAME;
+                    modbus_ready <= 1'b1;
+                    tx_wait_cnt <= 32'd0;
+                end
+                else if (tx_wait_cnt == CYCLE_1S_1000MBPS - 1'b1) begin
+                    tx_state <= TX_ARP_REQ ;
+                    arp_request_req <= 1'b1;
+                    tx_wait_cnt <= 32'd0;
+                end
+                else begin
+                    tx_state <= TX_ARP_WAIT ;
+                    tx_wait_cnt <= tx_wait_cnt + 1'b1;
+                end */
+                
+另外，默认情况下系统是没有使能的，需要是能系统。
+在core_udp.v中需要做如下修改。
+1. 将line159的enable默认值改为1.
+        // enable <= 1'b0;
+        enable <= 1'b1;         //used for simulation.
+2. 将line119发送时间间隔改为100us。
+localparam	SEND_PERIOD_CYCLE   = CLK_FRE * 100;   // 100 us used for simulation.
+// localparam	SEND_PERIOD_CYCLE   = CLK_FRE * 50000; 
